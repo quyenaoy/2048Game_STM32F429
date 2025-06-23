@@ -53,8 +53,7 @@ Application/User/main.o: D:/TouchGFX/Check/Core/Src/main.c \
  ../../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h \
  ../../TouchGFX/App/app_touchgfx.h \
  ../../Drivers/BSP/Components/ili9341/ili9341.h \
- ../../Drivers/BSP/Components/ili9341/../Common/lcd.h \
- D:/TouchGFX/Check/STM32CubeIDE/Application/User/gui/JoystickBridge.hpp
+ ../../Drivers/BSP/Components/ili9341/../Common/lcd.h
 ../../Core/Inc/main.h:
 ../../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:
 ../../Core/Inc/stm32f4xx_hal_conf.h:
@@ -110,4 +109,3 @@ Application/User/main.o: D:/TouchGFX/Check/Core/Src/main.c \
 ../../TouchGFX/App/app_touchgfx.h:
 ../../Drivers/BSP/Components/ili9341/ili9341.h:
 ../../Drivers/BSP/Components/ili9341/../Common/lcd.h:
-D:/TouchGFX/Check/STM32CubeIDE/Application/User/gui/JoystickBridge.hpp:
