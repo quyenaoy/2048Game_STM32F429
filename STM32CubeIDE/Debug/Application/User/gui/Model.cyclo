@@ -1,0 +1,8 @@
+D:/TouchGFX/Check/TouchGFX/gui/src/model/Model.cpp:9:1:Model::Model()	1
+D:/TouchGFX/Check/TouchGFX/gui/src/model/Model.cpp:13:6:void Model::tick()	3
+D:/TouchGFX/Check/TouchGFX/gui/src/model/Model.cpp:23:6:void Model::setJoystickValues(uint16_t, uint16_t)	1
+D:/TouchGFX/Check/TouchGFX/gui/src/model/Model.cpp:32:6:void Model::spawnRandomTile()	5
+D:/TouchGFX/Check/TouchGFX/gui/src/model/Model.cpp:54:6:void Model::moveLeft()	10
+D:/TouchGFX/Check/TouchGFX/gui/src/model/Model.cpp:87:6:void Model::moveUp()	1
+D:/TouchGFX/Check/TouchGFX/gui/src/model/Model.cpp:88:6:void Model::moveRight()	1
+D:/TouchGFX/Check/TouchGFX/gui/src/model/Model.cpp:91:6:void Model::moveDown()	1
