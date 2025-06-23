@@ -26,8 +26,9 @@
 /* USER CODE BEGIN Includes */
 #include "Components/ili9341/ili9341.h"
 #include <string.h>
-#include "gui/JoystickBridge.hpp"
 
+volatile JoystickDir joystickQueue = JOY_NONE;
+volatile uint8_t joystickBusy = 0;
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -198,10 +199,9 @@ int main(void)
   /* Call PreOsInit function */
   MX_TouchGFX_PreOSInit();
   /* USER CODE BEGIN 2 */
+  /* USER CODE END 2 */
   HAL_ADC_Start_IT(&hadc1);
   HAL_ADC_Start_IT(&hadc2);
-  /* USER CODE END 2 */
-
   /* Init scheduler */
   osKernelInitialize();
 
@@ -248,23 +248,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-      // --- Đọc ADC1 ---
-      HAL_ADC_Start(&hadc1);
-      HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
-      uint16_t adcX = HAL_ADC_GetValue(&hadc1);
-      HAL_ADC_Stop(&hadc1);
 
-      // --- Đọc ADC2 ---
-      HAL_ADC_Start(&hadc2);
-      HAL_ADC_PollForConversion(&hadc2, HAL_MAX_DELAY);
-      uint16_t adcY = HAL_ADC_GetValue(&hadc2);
-      HAL_ADC_Stop(&hadc2);
-
-
-      // --- Gọi Tick TouchGFX ---
-      MX_TouchGFX_Process();
-      setJoystickFromMain(adcX, adcY);
-      HAL_Delay(10);
 
   }
   /* USER CODE END 3 */
@@ -363,7 +347,7 @@ static void MX_ADC1_Init(void)
   */
   sConfig.Channel = ADC_CHANNEL_13;
   sConfig.Rank = 1;
-  sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;
+  sConfig.SamplingTime = ADC_SAMPLETIME_56CYCLES;
   if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
   {
     Error_Handler();
@@ -415,7 +399,7 @@ static void MX_ADC2_Init(void)
   */
   sConfig.Channel = ADC_CHANNEL_5;
   sConfig.Rank = 1;
-  sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;
+  sConfig.SamplingTime = ADC_SAMPLETIME_56CYCLES;
   if (HAL_ADC_ConfigChannel(&hadc2, &sConfig) != HAL_OK)
   {
     Error_Handler();
@@ -1127,18 +1111,37 @@ void LCD_Delay(uint32_t Delay)
   HAL_Delay(Delay);
 }
 
-/* USER CODE END 4 */
+volatile uint16_t adcX = 0, adcY = 0;
+void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
+{
+    if (hadc == &hadc1)
+    {
+        adcX = HAL_ADC_GetValue(hadc);
+        HAL_ADC_Start_IT(&hadc1); // Khởi động lại ADC1
+    }
+    else if (hadc == &hadc2)
+    {
+        adcY = HAL_ADC_GetValue(hadc);
+        HAL_ADC_Start_IT(&hadc2); // Khởi động lại ADC2
+    }
+    // Không xử lý hướng ở đây nữa
+}
 
-/* USER CODE BEGIN Header_StartDefaultTask */
 /**
   * @brief  Function implementing the defaultTask thread.
   * @param  argument: Not used
   * @retval None
   */
-/* USER CODE END Header_StartDefaultTask */
 void StartDefaultTask(void *argument)
 {
   /* USER CODE BEGIN 5 */
+  // Tạo task đọc hướng joystick
+  osThreadAttr_t joystickTask_attributes = {
+    .name = "joystickTask",
+    .stack_size = 128 * 4,
+    .priority = (osPriority_t) osPriorityLow,
+  };
+  osThreadNew(JoystickDirectionTask, NULL, &joystickTask_attributes);
   /* Infinite loop */
   for(;;)
   {
@@ -1146,6 +1149,43 @@ void StartDefaultTask(void *argument)
   }
   /* USER CODE END 5 */
 }
+
+/* USER CODE BEGIN 4 */
+void JoystickDirectionTask(void *argument)
+{
+    for(;;)
+    {
+        uint16_t x = adcX;
+        uint16_t y = adcY;
+        const uint16_t THRESHOLD = 100;
+
+        if (x < 128 - THRESHOLD && y >= 128 - THRESHOLD && y <= 128 + THRESHOLD)
+            joystickQueue = JOY_LEFT;
+        else if (x > 128 + THRESHOLD && y >= 128 - THRESHOLD && y <= 128 + THRESHOLD)
+            joystickQueue = JOY_RIGHT;
+        else if (y < 128 - THRESHOLD && x >= 128 - THRESHOLD && x <= 128 +  THRESHOLD)
+            joystickQueue = JOY_UP;
+        else if (y > 128 + THRESHOLD && x >= 128 - THRESHOLD && x <= 128 + THRESHOLD)
+            joystickQueue = JOY_DOWN;
+        else
+            joystickQueue = JOY_NONE;
+
+        if (joystickQueue != JOY_NONE) {
+            // Chờ joystick về trung tâm trước khi nhận hướng tiếp theo
+            while (1) {
+                x = adcX;
+                y = adcY;
+                if (x >= 128 - THRESHOLD && x <= 128 + THRESHOLD &&
+                    y >= 128 - THRESHOLD && y <= 128 + THRESHOLD)
+                    break;
+                osDelay(100);
+            }
+        }
+
+        osDelay(100); // Đọc joystick mỗi 500ms
+    }
+}
+/* USER CODE END 4 */
 
 /**
   * @brief  Period elapsed callback in non blocking mode

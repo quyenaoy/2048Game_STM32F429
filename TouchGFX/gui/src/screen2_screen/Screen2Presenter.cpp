@@ -19,23 +19,11 @@ void Screen2Presenter::deactivate()
 
 void Screen2Presenter::processJoystick(uint16_t x, uint16_t y)
 {
-    const int center = 128;
-    const int threshold = 0;
-
-    if (x < center - threshold)
-    {
-        model->moveLeft();
-    }else if (x > center + threshold)
-    {
-    	model->moveRight();
-    }else if (y < center - threshold)
-    {
-        model->moveUp();
-    }
-    else if (y > center + threshold)
-    {
-    	model->moveDown();
-    }
+	const uint16_t THRESHOLD = 20;
+	    if (x < 128 - THRESHOLD) model->moveLeft();
+	    else if (x > 128 + THRESHOLD) model->moveRight();
+	    else if (y < 128 - THRESHOLD) model->moveUp();
+	    else if (y > 128 + THRESHOLD) model->moveDown();
 
 }
 

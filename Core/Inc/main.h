@@ -32,7 +32,10 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+// Joystick direction enum and extern variables
+typedef enum { JOY_NONE, JOY_UP, JOY_DOWN, JOY_LEFT, JOY_RIGHT } JoystickDir;
+extern volatile JoystickDir joystickQueue;
+extern volatile uint8_t joystickBusy;
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -54,7 +57,7 @@ extern "C" {
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
-
+void JoystickDirectionTask(void *argument);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
