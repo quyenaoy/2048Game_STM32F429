@@ -1,0 +1,1 @@
+../Application/User/gui/JoystickBridge.cpp:5:17:void setJoystickFromMain(uint16_t, uint16_t)	1
