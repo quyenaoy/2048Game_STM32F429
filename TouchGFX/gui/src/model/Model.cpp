@@ -8,10 +8,14 @@
 #include "main.h"
 #include <cstdio>
 #include <stm32f4xx_hal.h>
+#include <stm32f4xx_hal_flash.h>
+#include <stm32f4xx_hal_flash_ex.h>
 
 // ====== Joystick Queue extern ======
 extern volatile JoystickDir joystickQueue;
 extern volatile uint8_t joystickBusy;
+
+#define HIGHSCORE_FLASH_ADDR  ((uint32_t)0x0807F800)
 
 Model::Model() : modelListener(0)
 {
@@ -96,14 +100,19 @@ void Model::moveLeft()
             if (col > 0 && matrix[i][col - 1] == matrix[i][col] && !merged[col - 1])
             {
                 matrix[i][col - 1] *= 2;
+                score += matrix[i][col - 1];
+                if (score > highscore) { highscore = score; saveHighScoreToFlash(); }
                 matrix[i][col] = 0;
                 merged[col - 1] = 1;
                 moved = true;
             }
         }
     }
-    if (moved)
+    if (moved) {
         spawnRandomTile();
+        if (modelListener) modelListener->updateScore(score, highscore);
+        if (isGameOver() && modelListener) modelListener->onGameOver();
+    }
 }
 
 void Model::moveUp()
@@ -126,14 +135,19 @@ void Model::moveUp()
             if (row > 0 && matrix[row - 1][j] == matrix[row][j] && !merged[row - 1])
             {
                 matrix[row - 1][j] *= 2;
+                score += matrix[row - 1][j];
+                if (score > highscore) { highscore = score; saveHighScoreToFlash(); }
                 matrix[row][j] = 0;
                 merged[row - 1] = 1;
                 moved = true;
             }
         }
     }
-    if (moved)
+    if (moved) {
         spawnRandomTile();
+        if (modelListener) modelListener->updateScore(score, highscore);
+        if (isGameOver() && modelListener) modelListener->onGameOver();
+    }
 }
 
 void Model::moveRight()
@@ -156,14 +170,19 @@ void Model::moveRight()
             if (col < 3 && matrix[i][col + 1] == matrix[i][col] && !merged[col + 1])
             {
                 matrix[i][col + 1] *= 2;
+                score += matrix[i][col + 1];
+                if (score > highscore) { highscore = score; saveHighScoreToFlash(); }
                 matrix[i][col] = 0;
                 merged[col + 1] = 1;
                 moved = true;
             }
         }
     }
-    if (moved)
+    if (moved) {
         spawnRandomTile();
+        if (modelListener) modelListener->updateScore(score, highscore);
+        if (isGameOver() && modelListener) modelListener->onGameOver();
+    }
 }
 
 void Model::moveDown()
@@ -186,12 +205,72 @@ void Model::moveDown()
             if (row < 3 && matrix[row + 1][j] == matrix[row][j] && !merged[row + 1])
             {
                 matrix[row + 1][j] *= 2;
+                score += matrix[row + 1][j];
+                if (score > highscore) { highscore = score; saveHighScoreToFlash(); }
                 matrix[row][j] = 0;
                 merged[row + 1] = 1;
                 moved = true;
             }
         }
     }
-    if (moved)
+    if (moved) {
         spawnRandomTile();
+        if (modelListener) modelListener->updateScore(score, highscore);
+        if (isGameOver() && modelListener) modelListener->onGameOver();
+    }
+}
+
+void Model::resetGame()
+{
+    memset(matrix, 0, sizeof(matrix));
+    score = 0;
+    loadHighScoreFromFlash();
+    spawnRandomTile();
+    spawnRandomTile();
+    if (modelListener)
+        modelListener->updateMatrix(matrix);
+    if (modelListener)
+        modelListener->updateScore(score, highscore);
+}
+
+void Model::saveHighScoreToFlash()
+{
+//    HAL_FLASH_Unlock();
+//    // Xóa sector trước khi ghi
+//    FLASH_EraseInitTypeDef EraseInitStruct;z
+//    uint32_t SectorError = 0;
+//    EraseInitStruct.TypeErase = FLASH_TYPEERASE_SECTORS;
+//    EraseInitStruct.VoltageRange = FLASH_VOLTAGE_RANGE_3;
+//    EraseInitStruct.Sector = FLASH_SECTOR_11; // sector cuối cùng (tùy chip)
+//    EraseInitStruct.NbSectors = 1;
+//    HAL_FLASHEx_Erase(&EraseInitStruct, &SectorError);
+//    // Ghi highscore
+//    HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, HIGHSCORE_FLASH_ADDR, highscore);
+//    HAL_FLASH_Lock();
+}
+
+void Model::loadHighScoreFromFlash()
+{
+    uint32_t value = *(uint32_t*)HIGHSCORE_FLASH_ADDR;
+    if (value == 0xFFFFFFFF) // flash chưa ghi
+        highscore = 0;
+    else
+        highscore = value;
+}
+
+bool Model::isGameOver()
+{
+    // Kiểm tra còn ô trống không
+    for (int i = 0; i < 4; ++i)
+        for (int j = 0; j < 4; ++j)
+            if (matrix[i][j] == 0)
+                return false;
+    // Kiểm tra còn cặp số nào có thể gộp không
+    for (int i = 0; i < 4; ++i)
+        for (int j = 0; j < 4; ++j)
+        {
+            if (i < 3 && matrix[i][j] == matrix[i+1][j]) return false;
+            if (j < 3 && matrix[i][j] == matrix[i][j+1]) return false;
+        }
+    return true;
 }

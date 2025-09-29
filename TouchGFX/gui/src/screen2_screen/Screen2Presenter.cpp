@@ -31,3 +31,20 @@ void Screen2Presenter::updateMatrix(uint16_t matrix[4][4])
 {
     view.updateGrid(matrix);
 }
+
+void Screen2Presenter::onNewGameButtonPressed()
+{
+    if (model) {
+        model->resetGame();
+    }
+}
+
+void Screen2Presenter::updateScore(uint32_t score, uint32_t highscore)
+{
+    view.updateScore(score, highscore);
+}
+
+void Screen2Presenter::onGameOver()
+{
+    view.onGameOver();
+}

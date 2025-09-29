@@ -6,6 +6,15 @@
   <Texts>
     <TextGroup Id="Group1" />
     <TextGroup Id="Unsorted">
+      <Text Id="__SingleUse_AZK4" Alignment="Center" TypographyId="Small">
+        <Translation Language="GB">Score:&#10;&lt;scoreValue&gt;</Translation>
+      </Text>
+      <Text Id="__SingleUse_B94D" Alignment="Center" TypographyId="Small">
+        <Translation Language="GB">Highest Score:&#10;&lt;highscore&gt;</Translation>
+      </Text>
+      <Text Id="__SingleUse_BBX8" Alignment="Center" TypographyId="Small">
+        <Translation Language="GB">Reset</Translation>
+      </Text>
       <Text Id="__SingleUse_IWHF" Alignment="Center" TypographyId="Default">
         <Translation Language="GB">New Game!</Translation>
       </Text>

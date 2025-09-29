@@ -29,6 +29,9 @@ public:
 
     virtual void processJoystick(uint16_t x, uint16_t y);
     virtual void updateMatrix(uint16_t matrix[4][4]);
+    void onNewGameButtonPressed(); // New function declaration
+    virtual void updateScore(uint32_t score, uint32_t highscore) override;
+    virtual void onGameOver() override;
 
 private:
     Screen2Presenter();
