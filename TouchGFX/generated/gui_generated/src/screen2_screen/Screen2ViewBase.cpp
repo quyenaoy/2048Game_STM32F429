@@ -7,7 +7,8 @@
 #include <texts/TextKeysAndLanguages.hpp>
 
 Screen2ViewBase::Screen2ViewBase() :
-    buttonCallback(this, &Screen2ViewBase::buttonCallbackHandler)
+    buttonCallback(this, &Screen2ViewBase::buttonCallbackHandler),
+    flexButtonCallback(this, &Screen2ViewBase::flexButtonCallbackHandler)
 {
     __background.setPosition(0, 0, 240, 320);
     __background.setColor(touchgfx::Color::getColorFromRGB(0, 0, 0));
@@ -72,6 +73,31 @@ Screen2ViewBase::Screen2ViewBase() :
     buttonWithLabel1.setLabelColorPressed(touchgfx::Color::getColorFromRGB(255, 255, 255));
     buttonWithLabel1.setAction(buttonCallback);
     add(buttonWithLabel1);
+
+    Reset.setBoxWithBorderPosition(0, 0, 42, 22);
+    Reset.setBorderSize(5);
+    Reset.setBoxWithBorderColors(touchgfx::Color::getColorFromRGB(255, 255, 255), touchgfx::Color::getColorFromRGB(0, 153, 204), touchgfx::Color::getColorFromRGB(255, 255, 255), touchgfx::Color::getColorFromRGB(51, 102, 153));
+    Reset.setAction(flexButtonCallback);
+    Reset.setPosition(12, 53, 42, 22);
+    add(Reset);
+
+    textArea1.setXY(19, 58);
+    textArea1.setColor(touchgfx::Color::getColorFromRGB(0, 0, 0));
+    textArea1.setLinespacing(0);
+    textArea1.setTypedText(touchgfx::TypedText(T___SINGLEUSE_BBX8));
+    add(textArea1);
+
+    HighScore.setXY(80, 53);
+    HighScore.setColor(touchgfx::Color::getColorFromRGB(255, 255, 255));
+    HighScore.setLinespacing(0);
+    HighScore.setTypedText(touchgfx::TypedText(T___SINGLEUSE_B94D));
+    add(HighScore);
+
+    Score.setXY(182, 53);
+    Score.setColor(touchgfx::Color::getColorFromRGB(255, 255, 255));
+    Score.setLinespacing(0);
+    Score.setTypedText(touchgfx::TypedText(T___SINGLEUSE_AZK4));
+    add(Score);
 }
 
 Screen2ViewBase::~Screen2ViewBase()
@@ -107,5 +133,16 @@ void Screen2ViewBase::buttonCallbackHandler(const touchgfx::AbstractButton& src)
         //When buttonWithLabel1 clicked change screen to Screen1
         //Go to Screen1 with screen transition towards East
         application().gotoScreen1ScreenSlideTransitionEast();
+    }
+}
+
+void Screen2ViewBase::flexButtonCallbackHandler(const touchgfx::AbstractButtonContainer& src)
+{
+    if (&src == &Reset)
+    {
+        //Interaction2
+        //When Reset clicked call virtual function
+        //Call resetButtonEvent
+        resetButtonEvent();
     }
 }

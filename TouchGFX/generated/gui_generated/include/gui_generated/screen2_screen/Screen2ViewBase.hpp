@@ -11,6 +11,9 @@
 #include <touchgfx/widgets/Image.hpp>
 #include <gui/containers/CustomContainer.hpp>
 #include <touchgfx/widgets/ButtonWithLabel.hpp>
+#include <touchgfx/containers/buttons/Buttons.hpp>
+#include <touchgfx/widgets/TextArea.hpp>
+#include <touchgfx/widgets/TextAreaWithWildcard.hpp>
 
 class Screen2ViewBase : public touchgfx::View<Screen2Presenter>
 {
@@ -18,6 +21,14 @@ public:
     Screen2ViewBase();
     virtual ~Screen2ViewBase();
     virtual void setupScreen();
+
+    /*
+     * Virtual Action Handlers
+     */
+    virtual void resetButtonEvent()
+    {
+        // Override and implement this function in Screen2
+    }
 
 protected:
     FrontendApplication& application() {
@@ -46,6 +57,10 @@ protected:
     CustomContainer customContainer43;
     CustomContainer customContainer44;
     touchgfx::ButtonWithLabel buttonWithLabel1;
+    touchgfx::BoxWithBorderButtonStyle< touchgfx::ClickButtonTrigger >  Reset;
+    touchgfx::TextArea textArea1;
+    touchgfx::TextAreaWithOneWildcard HighScore;
+    touchgfx::TextAreaWithOneWildcard Score;
 
 private:
 
@@ -53,11 +68,13 @@ private:
      * Callback Declarations
      */
     touchgfx::Callback<Screen2ViewBase, const touchgfx::AbstractButton&> buttonCallback;
+    touchgfx::Callback<Screen2ViewBase, const touchgfx::AbstractButtonContainer&> flexButtonCallback;
 
     /*
      * Callback Handler Declarations
      */
     void buttonCallbackHandler(const touchgfx::AbstractButton& src);
+    void flexButtonCallbackHandler(const touchgfx::AbstractButtonContainer& src);
 
 };
 

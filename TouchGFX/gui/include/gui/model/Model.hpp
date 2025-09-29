@@ -23,6 +23,7 @@ public:
     void moveUp();
     void moveDown();
     void initBoard();
+    void resetGame(); // reset lại ma trận và sinh 2 số 2 ngẫu nhiên
     uint16_t joyX = 0;
     uint16_t joyY = 0;
     uint16_t matrix[4][4];
@@ -30,12 +31,16 @@ public:
 //    void initBoard();
 
     void spawnRandomTile(); // tạo ô mới
+    bool isGameOver();
 
 protected:
     ModelListener* modelListener;
 
 private:
-
+    uint32_t score = 0;
+    uint32_t highscore = 0;
+    void saveHighScoreToFlash();
+    void loadHighScoreFromFlash();
 };
 
 #endif // MODEL_HPP
